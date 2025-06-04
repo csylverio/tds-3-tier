@@ -177,6 +177,13 @@
    ```
 4. Execute o projeto via Visual Studio (F5).
 
+**OBS**:
+   O comando Add-Migration não é reconhecido no terminal do Linux/macOS, pois esse comando pertence ao PowerShell do Entity Framework Core, usado via o Package Manager Console no Visual Studio (Windows).
+   Utilizar os comandos:
+   ```
+    dotnet ef migrations add Init --project MyFinance
+    dotnet ef database update --project MyFinance
+   ```
 ---
 
 ## Autor
