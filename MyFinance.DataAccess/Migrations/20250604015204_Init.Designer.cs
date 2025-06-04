@@ -3,16 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyFinance.Data;
+using MyFinance.DataAccess.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MyFinance.Migrations
+namespace MyFinance.DataAccess.Migrations
 {
     [DbContext(typeof(MyFinanceContext))]
-    [Migration("20250530002438_Initial")]
-    partial class Initial
+    [Migration("20250604015204_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

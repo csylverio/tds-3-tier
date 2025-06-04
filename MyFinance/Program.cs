@@ -1,13 +1,19 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using MyFinance.Data;
+using MyFinance.Business.Repository;
+using MyFinance.Business.Service;
+using MyFinance.DataAccess.Data;
+using MyFinance.DataAccess.Repository;
+
+
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 builder.Services.AddDbContext<MyFinanceContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MyFinanceContext") 
     ?? throw new InvalidOperationException("Connection string 'MyFinanceContext' not found.")));
+
+// mapeia classes para Inversão de Dependencia (DI)
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -24,9 +30,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

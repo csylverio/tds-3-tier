@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MyFinance.Models;
 
-namespace MyFinance.Data
+namespace MyFinance.DataAccess.Data
 {
     public class MyFinanceContext : DbContext
     {
@@ -14,6 +13,6 @@ namespace MyFinance.Data
         {
         }
 
-        public DbSet<MyFinance.Models.Account> Account { get; set; } = default!;
+        public DbSet<MyFinance.Business.Entity.Account> Account { get; set; } = default!;
     }
 }

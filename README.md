@@ -189,3 +189,17 @@
 ## Autor
 
 Desenvolvido como material didático para aulas de ASP.NET MVC com Entity Framework Core.
+
+
+## Refactoring
+
+ - Solution adicionada a raíz do projeto para permitir adicionar outros projetos (ClassLibrary para representar outras camadas do projeto)
+ - Adição do docker-compose contendo script para banco de dados
+ - Adição do projeto ClassLibrary MyFinance.Business a Solution
+ - Adição do projeto ClassLibrary MyFinance.DataAccess a Solution
+ - Movendo diretórios Data e Mifrations para MyFinance.DataAccess
+ - Adicionando pacote Entity com Account que representa instância do banco de dados (conceito de DDD) para o MyFinance.Business
+ - Adequação das dependencias aos projetos (removendo dependencias do projeto Presentation e adicionando ao projeto DataAccess
+ - Adequação de namespace
+ - Remoção do Attribute Key do objeto Account do projeto Presentation.Models (Models devem representar informações 
+ - Refactory da controller AccountsController (removendo dependencia com banco, acessando com Service)

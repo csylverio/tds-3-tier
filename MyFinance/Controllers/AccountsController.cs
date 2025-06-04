@@ -1,157 +1,157 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using MyFinance.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyFinance.Business.Service;
 using MyFinance.Models;
 
-namespace MyFinance.Controllers
+namespace MyFinance.Controllers;
+
+public class AccountsController : Controller
 {
-    public class AccountsController : Controller
+    private readonly IAccountService _accountService;
+
+    public AccountsController(IAccountService accountService)
     {
-        private readonly MyFinanceContext _context;
-
-        public AccountsController(MyFinanceContext context)
+        _accountService = accountService;
+    }   
+    
+    // GET: Accounts
+    public async Task<IActionResult> Index()
+    {
+        var list = await _accountService.GetListAsync();
+        var accounts = list.Select(x => new Account()
         {
-            _context = context;
+            Id = x.Id,
+            Name = x.Name,
+            Balance = x.Balance
+        }).ToList();
+
+        return View(accounts);
+    }
+
+    // GET: Accounts/Details/5
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+        
+        var entity = await _accountService.GetByIdAsync(id.Value);
+        if (entity == null)
+        {
+            return NotFound();
         }
 
-        // GET: Accounts
-        public async Task<IActionResult> Index()
+        var account = new Account()
         {
-            return View(await _context.Account.ToListAsync());
-        }
+            Id = entity.Id,
+            Name = entity.Name,
+            Balance = entity.Balance
+        };
 
-        // GET: Accounts/Details/5
-        public async Task<IActionResult> Details(int? id)
+        return View(account);
+    }
+
+    // GET: Accounts/Create
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    // POST: Accounts/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Id,Name,Balance")] Account account)
+    {
+        if (ModelState.IsValid)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var account = await _context.Account
-                .FirstOrDefaultAsync(account => account.Id == id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-
-            return View(account);
-        }
-
-        // GET: Accounts/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Accounts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Balance")] Account account)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(account);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(account);
-        }
-
-        // GET: Accounts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var account = await _context.Account.FindAsync(id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-            return View(account);
-        }
-
-        // POST: Accounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Balance")] Account account)
-        {
-            if (id != account.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(account);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AccountExists(account.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(account);
-        }
-
-        // GET: Accounts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var account = await _context.Account
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (account == null)
-            {
-                return NotFound();
-            }
-
-            return View(account);
-        }
-
-        // POST: Accounts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var account = await _context.Account.FindAsync(id);
-            if (account != null)
-            {
-                _context.Account.Remove(account);
-            }
-
-            await _context.SaveChangesAsync();
+            await _accountService.AddAsync(account.Name, account.Balance);
             return RedirectToAction(nameof(Index));
         }
+        return View(account);
+    }
 
-        private bool AccountExists(int id)
+    // GET: Accounts/Edit/5
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
         {
-            return _context.Account.Any(e => e.Id == id);
+            return NotFound();
         }
+        if (!await _accountService.ExistsAsync(id.Value))
+        {
+            return NotFound();
+        }
+
+        var entity = await _accountService.GetByIdAsync(id.Value);
+        var account = new Account()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Balance = entity.Balance
+        };
+
+        return View(account);
+    }
+
+    // POST: Accounts/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Balance")] Account account)
+    {
+        if (id != account.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            if (!await _accountService.ExistsAsync(id))
+            {
+                return NotFound();
+            }
+
+            await _accountService.UpdateAsync(id, account.Name, account.Balance);
+
+            return RedirectToAction(nameof(Index));
+        }
+        return View(account);
+    }
+
+    // GET: Accounts/Delete/5
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var entity = await _accountService.GetByIdAsync(id.Value);
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        var account = new Account()
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Balance = entity.Balance
+        };
+
+        return View(account);
+    }
+
+    // POST: Accounts/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        if (!await _accountService.ExistsAsync(id))
+        {
+            return NotFound();
+        }
+        await _accountService.DeleteAsync(id);
+
+        return RedirectToAction(nameof(Index));
     }
 }

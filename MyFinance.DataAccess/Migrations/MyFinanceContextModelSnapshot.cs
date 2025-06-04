@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MyFinance.Data;
+using MyFinance.DataAccess.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MyFinance.Migrations
+namespace MyFinance.DataAccess.Migrations
 {
     [DbContext(typeof(MyFinanceContext))]
     partial class MyFinanceContextModelSnapshot : ModelSnapshot

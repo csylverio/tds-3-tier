@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace MyFinance.Models
+namespace MyFinance.Models;
+
+public class Account
 {
-    public class Account
-    {
-        [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public double Balance { get; set; }
-
-    }
 }

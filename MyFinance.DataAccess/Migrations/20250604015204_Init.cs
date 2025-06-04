@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace MyFinance.Migrations
+namespace MyFinance.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class Init : Migration
