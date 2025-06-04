@@ -203,3 +203,32 @@ Desenvolvido como material didático para aulas de ASP.NET MVC com Entity Framew
  - Adequação de namespace
  - Remoção do Attribute Key do objeto Account do projeto Presentation.Models (Models devem representar informações 
  - Refactory da controller AccountsController (removendo dependencia com banco, acessando com Service)
+
+
+ ## Testes
+
+### Teste unitário
+
+1. Adicionar o pacote NuGet do xUnit, Moq
+2. Adicionar referencia aos projetos que serão testados 
+``` 
+    dotnet add package xunit
+    dotnet add package Moq
+``` 
+
+### Testes de Integração para Serviços e Bancos de Dados
+
+1. Adicionar o pacote NuGet correspondente ao provedor de banco de dados em memória do Entity Framework Core.
+``` 
+    dotnet add package Microsoft.EntityFrameworkCore.InMemory
+``` 
+2. o arquivo .cs, certifique-se de ter a seguinte diretiva de using:
+``` 
+    using Microsoft.EntityFrameworkCore;
+``` 
+3. Exemplo de uso correto
+``` 
+    var options = new DbContextOptionsBuilder<MyFinanceContext>()
+                                .UseInMemoryDatabase("BancoDeTeste")
+                                .Options;
+``` 

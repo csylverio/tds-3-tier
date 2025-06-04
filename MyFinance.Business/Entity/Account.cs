@@ -9,5 +9,9 @@ namespace MyFinance.Business.Entity
         public required string Name { get; set; }
         public double Balance { get; set; }
 
+        public bool IsBalanceValid(double balance)
+        {
+            return Balance >= 0;
+        }
     }
 }

@@ -33,7 +33,12 @@ public class AccountRepository : IAccountRepository
 
     public async Task DeleteAsync(int id)
     {
-        await _context.Account.Where(account => account.Id == id).ExecuteDeleteAsync();
+        var entity = await _context.Account.FirstOrDefaultAsync(account => account.Id == id);
+        if (entity != null)
+        {
+            _context.Account.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task UpdateAsync(Account account)

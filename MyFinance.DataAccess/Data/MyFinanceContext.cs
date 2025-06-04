@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace MyFinance.DataAccess.Data
 {
@@ -13,6 +9,6 @@ namespace MyFinance.DataAccess.Data
         {
         }
 
-        public DbSet<MyFinance.Business.Entity.Account> Account { get; set; } = default!;
+        public DbSet<Business.Entity.Account> Account { get; set; } = default!;
     }
 }
