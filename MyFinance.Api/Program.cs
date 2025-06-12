@@ -14,7 +14,16 @@ using MyFinance.DataAccess.Repository;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "MyFinance API",
+        Version = "v1",
+        Description = "API para gerenciamento de contas financeiras",
+        Contact = new OpenApiContact { Name = "Carlos Sylverio", Email = "contato@example.com" }
+    });
+});
 builder.Services.AddControllers();
 
 // Injeção de dependencia
@@ -53,7 +62,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Description = "JWT Authorization Header",
+        Description = "Insira o token JWT no formato: Bearer {token}",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",

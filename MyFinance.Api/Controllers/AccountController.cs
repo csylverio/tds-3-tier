@@ -12,7 +12,6 @@ namespace MyFinance.Api.Controllers;
 [ApiController]
 public class AccountController(IAccountService accountService) : ControllerBase
 {
-    private readonly Guid _guid = Guid.NewGuid();
     private readonly IAccountService _accountService = accountService;
 
     [HttpGet]
@@ -32,10 +31,10 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
     [HttpGet("{id}")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(int id)
     {
-        if (id <= 0)
-            return BadRequest("Id deve ser maior que 0.");
         if (!await _accountService.ExistsAsync(id))
             return NotFound();
 
@@ -50,6 +49,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
     [HttpPost]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreateAccountDTO accountDTO)
     {
         var createdAccount = await _accountService.AddAsync(accountDTO.Name, accountDTO.Balance);
