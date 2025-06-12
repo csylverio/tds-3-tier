@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance", "MyFinance\MyFinance.csproj", "{9AC5002F-395B-48A0-95E9-56A1D9A59C53}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance.Business", "MyFinance.Business\MyFinance.Business.csproj", "{35777382-B5CE-4F10-ACC6-0EF558187376}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance.DataAccess", "MyFinance.DataAccess\MyFinance.DataAccess.csproj", "{BA566BF9-B9EA-4A58-9176-EE962A3ED1EF}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9AC5002F-395B-48A0-95E9-56A1D9A59C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AC5002F-395B-48A0-95E9-56A1D9A59C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AC5002F-395B-48A0-95E9-56A1D9A59C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AC5002F-395B-48A0-95E9-56A1D9A59C53}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35777382-B5CE-4F10-ACC6-0EF558187376}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{35777382-B5CE-4F10-ACC6-0EF558187376}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35777382-B5CE-4F10-ACC6-0EF558187376}.Release|Any CPU.ActiveCfg = Release|Any CPU
