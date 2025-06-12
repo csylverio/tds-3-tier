@@ -21,7 +21,7 @@ public class AccountService : IAccountService
     public async Task<Account> GetByIdAsync(int value)
     {
         Account? account = await _accountRepository.GetByIdAsync(value);
-        return account ?? throw new InvalidOperationException("Conta inválida!");
+        return account ?? throw new NotFoundException("Conta inválida!");
     }
 
     public Task<List<Account>> GetListAsync()

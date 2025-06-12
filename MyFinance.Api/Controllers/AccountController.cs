@@ -8,8 +8,9 @@ using MyFinance.Business.Service;
 namespace MyFinance.Api.Controllers;
 
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
+[Authorize]
 public class AccountController(IAccountService accountService) : ControllerBase
 {
     private readonly IAccountService _accountService = accountService;
@@ -18,6 +19,8 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetList()
     {
+        // Deveria receber um PaginationFilter para parametro
+        // utilizar _context.Accounts.AsQueryable(); no repositorio
         var list = await _accountService.GetListAsync();
         var accounts = list.Select(x => new AccountDTO()
         {
@@ -35,16 +38,21 @@ public class AccountController(IAccountService accountService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(int id)
     {
-        if (!await _accountService.ExistsAsync(id))
-            return NotFound();
-
-        var entity = await _accountService.GetByIdAsync(id);
-        return Ok(new AccountDTO()
+        try
         {
-            Id = entity.Id,
-            Name = entity.Name,
-            Balance = entity.Balance
-        });
+            var account = await _accountService.GetByIdAsync(id);
+            return Ok(new AccountDTO(account.Id, account.Name, account.Balance));
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Conta não encontrada!",
+                Detail = ex.Message
+            });
+        }
+
     }
 
     [HttpPost]
@@ -78,3 +86,10 @@ public class AccountController(IAccountService accountService) : ControllerBase
         return NoContent();
     }
 }
+/*
+Pontos de melhorias
+1. Falta de tratamento centralizado de erros
+2. Documentação Swagger incompleta
+3. Validações redundantes nos controllers
+4. Lógica de mapeamento manual (poderia usar AutoMapper) para conversões de entidades
+*/

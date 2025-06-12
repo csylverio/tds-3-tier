@@ -80,6 +80,17 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+// IMPORTANTE: usar essa configuração somente em DEV
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -91,6 +102,7 @@ if (app.Environment.IsDevelopment())
     // middleware customizado
     app.UseLoginsMiddleware();
 }
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
