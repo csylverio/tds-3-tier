@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance", "MyFinance\MyFinance.csproj", "{9AC5002F-395B-48A0-95E9-56A1D9A59C53}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance.DataAccess", "MyFinance.DataAccess\MyFinance.DataAccess.csproj", "{BA566BF9-B9EA-4A58-9176-EE962A3ED1EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance.Tests", "MyFinance.Tests\MyFinance.Tests.csproj", "{5087F809-B86D-4C8C-973C-D9B268EFEDFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyFinance.Api", "MyFinance.Api\MyFinance.Api.csproj", "{D821767D-0267-42A0-A850-40D944C65F4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{5087F809-B86D-4C8C-973C-D9B268EFEDFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5087F809-B86D-4C8C-973C-D9B268EFEDFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5087F809-B86D-4C8C-973C-D9B268EFEDFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D821767D-0267-42A0-A850-40D944C65F4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D821767D-0267-42A0-A850-40D944C65F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D821767D-0267-42A0-A850-40D944C65F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D821767D-0267-42A0-A850-40D944C65F4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

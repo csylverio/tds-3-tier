@@ -21,7 +21,8 @@ public class AccountsController : Controller
         {
             Id = x.Id,
             Name = x.Name,
-            Balance = x.Balance
+            Balance = x.Balance,
+            DataExecucao = DateTime.Now
         }).ToList();
 
         return View(accounts);
