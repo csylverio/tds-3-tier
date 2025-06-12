@@ -21,7 +21,7 @@ public class AccountService : IAccountService
     public async Task<Account> GetByIdAsync(int value)
     {
         Account? account = await _accountRepository.GetByIdAsync(value);
-        return account ?? throw new Exception("Conta não encontrada");
+        return account ?? throw new InvalidOperationException("Conta inválida!");
     }
 
     public Task<List<Account>> GetListAsync()
@@ -30,13 +30,15 @@ public class AccountService : IAccountService
         return Task.FromResult(accounts);
     }
 
-    public async Task AddAsync(string name, double balance)
+    public async Task<Account> AddAsync(string name, double balance)
     {
-        await _accountRepository.AddAsync(new Account
+        Account account = await _accountRepository.AddAsync(new Account
         {
             Name = name,
             Balance = balance
         });
+
+        return account;
     }
 
     public async Task UpdateAsync(int id, string name, double balance)

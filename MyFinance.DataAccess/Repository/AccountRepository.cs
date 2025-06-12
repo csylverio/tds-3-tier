@@ -25,10 +25,11 @@ public class AccountRepository : IAccountRepository
         return await _context.Account.ToListAsync();
     }
 
-    public async Task AddAsync(Account account)
+    public async Task<Account> AddAsync(Account account)
     {
         _context.Add(account);
         await _context.SaveChangesAsync();
+        return account;
     }
 
     public async Task DeleteAsync(int id)
