@@ -16,12 +16,12 @@ namespace MyFinance.DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.17")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MyFinance.Models.Account", b =>
+            modelBuilder.Entity("MyFinance.Business.Entity.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
