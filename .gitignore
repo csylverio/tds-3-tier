@@ -55,3 +55,8 @@ nunit-*.xml
 
 # vscode
 .vscode
+
+# Rider 
+/.idea/
+/MyFinance.sln.DotSettings.user
+>>>>>>> feature/3-tiers
