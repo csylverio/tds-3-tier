@@ -3,8 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MyFinance.Data;
 var builder = WebApplication.CreateBuilder(args);
 
-
-
 builder.Services.AddDbContext<MyFinanceContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MyFinanceContext") 
     ?? throw new InvalidOperationException("Connection string 'MyFinanceContext' not found.")));
@@ -24,11 +22,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
