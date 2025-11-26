@@ -6,229 +6,200 @@
 
 ---
 
-## Funcionalidades
+## MyFinance – Arquitetura em 3 Camadas (3-Tier Architecture)
 
-- **Cadastro de Usuário:** Permite a criação de contas para uso do sistema.
-- **Menu Principal:** Acesso centralizado às funcionalidades.
-- **Cadastro de Contas:** Inclui descrição e data de abertura.
-- **Cadastro de Transações:** Registro de receitas e despesas associadas a contas.
-- **Relatório de Extrato:** Visualização das transações por conta e período.
-- **Relatório Gráfico:** Demonstração de receitas e despesas por período e por conta.
+Este repositório apresenta a evolução do projeto **MyFinance**, originalmente desenvolvido como uma aplicação ASP.NET MVC monolítica, agora refatorada para utilizar o padrão **Arquitetura em 3 Camadas (Presentation → Business → DataAccess)**.
+
+O objetivo desta versão é demonstrar uma arquitetura mais organizada, escalável e alinhada a boas práticas profissionais, servindo como base para estudos de Arquitetura de Software e .NET.
 
 ---
 
-## Requisitos Não-Funcionais
+## 📁 Estrutura da Solution
+```js
+MyFinance.sln
+│
+├── MyFinance → Camada de Apresentação (Web MVC)
+├── MyFinance.Business → Camada de Negócio (Domínio, Serviços)
+└── MyFinance.DataAccess → Camada de Acesso a Dados (EF Core)
+```
 
-- **IDE:** Microsoft Visual Studio 2022
-- **Framework:** ASP.NET MVC (.NET 8)
-- **Linguagem:** C#
-- **Banco de Dados:** PostgreSQL, MySQL ou SQL Server
 
 ---
 
-## Estrutura do Projeto e Passos de Desenvolvimento
+## 🧱 Camadas da Arquitetura
 
-### ✅ Organização Inicial
-
-- Criar a pasta `ViewModels` e mover o `ErrorViewModel` para ela.
-- Compilar (CTRL + SHIFT + B) para verificar erros.
-
----
-
-### ✅ Modelagem Inicial - `Account`
-
-1. Criar classe `Models/Account`.
-2. Criar `AccountsController` (MVC Controller Empty).
-3. Instanciar `List<Account>` e passar como parâmetro para a View.
-4. Criar pasta `Views/Accounts`.
-5. Criar View `Index` com template "List" e model `Account`.
-6. Alterar o título para "Accounts".
+### **1. MyFinance (Presentation Layer)**
+- Implementação ASP.NET MVC.
+- Controllers e Views.
+- Consome serviços da camada Business.
+- Não tem acesso direto ao banco.
 
 ---
 
-### 🔄 Refatoração
-
-- Excluir `AccountsController` e a pasta `Views/Accounts`.
-
----
-
-### ✅ Scaffold de CRUD
-
-1. Criar Scaffold: Controller + Views com Entity Framework.
-2. Selecionar model `Account`, contexto de dados e opções de visualização.
-3. Nomear como `AccountsController`.
+### **2. MyFinance.Business (Business Layer)**
+- Contém o **modelo de domínio**, como a entidade `Account`.
+- Serviços responsáveis por regras de negócio.
+- Ideal para testes unitários.
+- Não conhece detalhes de banco de dados (facilita substituições e refatorações).
 
 ---
 
-### ✅ Adaptação e Primeira Migration
-
-1. Ajustar a string de conexão.
-2. Verificar injeção de dependência no `Program.cs`.
-3. Instalar provider do banco.
-4. No **Package Manager Console**:
-   ```bash
-   Add-Migration Initial
-   Update-Database
-   ```
+### **3. MyFinance.DataAccess (Data Layer)**
+- Implementação de persistência usando **Entity Framework Core**.
+- Contém:
+   - `MyFinanceContext`
+   - Configurações EF
+   - Migrations
+- Referenciada pela camada Business via DI.
 
 ---
 
-### ✅ Outras Entidades e Segunda Migration
+## 🔧 Melhorias Implementadas Nesta Branch
 
-1. Criar demais modelos de domínio.
-   - Atributos
-   - Relacionamentos (`ICollection`)
-   - Construtores e métodos específicos
-2. Adicionar `DbSet` no `DbContext`.
-3. Migration:
-   ```bash
-   Add-Migration OtherEntities
-   Update-Database
-   ```
+### ✔ Separação de responsabilidades
+O código foi reorganizado em 3 projetos distintos, evitando mistura entre UI, regras de negócio e persistência.
 
----
+### ✔ Entidade de domínio movida para a camada Business
+A classe `Account` agora reflete o modelo de domínio de forma consistente.
 
-### ✅ Seeding Service
+### ✔ Migrations e DbContext isolados
+Elimina dependência direta da aplicação Web com o banco de dados.
 
-1. Criar `SeedingService` na pasta `Data`.
-2. Registrar e chamar o serviço no `Program.cs`.
+### ✔ Controller mais limpa
+`AccountsController` passa a utilizar serviços de negócio, reduzindo acoplamento.
 
----
+### ✔ Docker Compose adicionado
+Agora você pode subir o ambiente (para inicialização do banco de dados) com:
 
-### ✅ Transactions
-
-#### Criação do Controller e View
-
-1. Criar links no navbar para Account e Transaction.
-2. Criar pasta `Views/Transactions` e View `Index`.
-3. Alterar título da View.
-
-#### Criar `TransactionService` e método `FindAll`
-
-1. Criar pasta `Services` e classe `TransactionService`.
-2. Registrar no `Program.cs`.
-3. Implementar `FindAll()` retornando `List<Transaction>`.
-4. Usar no `TransactionController`.
-
-#### Criar Formulário Simples
-
-1. Criar link "Create" em `Views/Transactions/Index`.
-2. Implementar `Create` (GET) na controller.
-3. Criar View `Create`.
-4. Implementar `Insert()` no `TransactionService`.
-5. Implementar `Create` (POST) na controller.
-
----
-
-### ✅ Chave Estrangeira Obrigatória
-
-1. Adicionar `AccountId` em `Transaction`.
-2. Dropar banco, recriar migration:
-   ```bash
-   Drop-Database
-   Add-Migration TransactionFK
-   Update-Database
-   ```
-3. Atualizar `Insert()` no `TransactionService`.
-
----
-
-### ✅ TransactionFormViewModel e Select de Contas
-
-1. Criar `AccountService` com `FindAll()`.
-2. Registrar no `Program.cs`.
-3. Criar `TransactionFormViewModel`.
-4. Atualizar Controller:
-   - Injetar `AccountService`
-   - Atualizar `Create` GET
-5. Atualizar View `Create`:
-   - Usar `TransactionFormViewModel`
-   - Adicionar campo `select` para `AccountId`
-
----
-
-### ✅ Detalhes da Transação e Eager Loading
-
-1. Adicionar link para `Details` em `Views/Transactions/Index`.
-2. Criar Action `Details` no Controller.
-3. Criar View `Details`.
-4. Incluir `Include(obj => obj.Account)` no `FindAll()`.
-
----
-
-## Tecnologias Utilizadas
-
-- ASP.NET Core MVC (.NET 8)
-- C#
-- Entity Framework Core
-- PostgreSQL / MySQL / SQL Server
-- Bootstrap (para layout)
-
----
-
-## Instruções para Execução
-
-1. Clone o repositório.
-2. Configure a string de conexão em `appsettings.json`.
-3. Execute os comandos de migration:
-   ```bash
-   Add-Migration Init
-   Update-Database
-   ```
-4. Execute o projeto via Visual Studio (F5).
-
-**OBS**:
-   O comando Add-Migration não é reconhecido no terminal do Linux/macOS, pois esse comando pertence ao PowerShell do Entity Framework Core, usado via o Package Manager Console no Visual Studio (Windows).
-   Utilizar os comandos:
-   ```
-    dotnet ef migrations add Init --project MyFinance
-    dotnet ef database update --project MyFinance
-   ```
----
-
-## Autor
-
-Desenvolvido como material didático para aulas de ASP.NET MVC com Entity Framework Core.
-
-
-## Refactoring
-
- - Solution adicionada a raíz do projeto para permitir adicionar outros projetos (ClassLibrary para representar outras camadas do projeto)
- - Adição do docker-compose contendo script para banco de dados
- - Adição do projeto ClassLibrary MyFinance.Business a Solution
- - Adição do projeto ClassLibrary MyFinance.DataAccess a Solution
- - Movendo diretórios Data e Mifrations para MyFinance.DataAccess
- - Adicionando pacote Entity com Account que representa instância do banco de dados (conceito de DDD) para o MyFinance.Business
- - Adequação das dependencias aos projetos (removendo dependencias do projeto Presentation e adicionando ao projeto DataAccess
- - Adequação de namespace
- - Remoção do Attribute Key do objeto Account do projeto Presentation.Models (Models devem representar informações 
- - Refactory da controller AccountsController (removendo dependencia com banco, acessando com Service)
-
-
- ## Testes
-
-### Teste unitário
-
-1. Adicionar o pacote NuGet do xUnit, Moq
-2. Adicionar referencia aos projetos que serão testados 
-``` 
-    dotnet add package xunit
-    dotnet add package Moq
+```bash
+docker compose up
 ``` 
 
-### Testes de Integração para Serviços e Bancos de Dados
+Rode a aplicação:
 
-1. Adicionar o pacote NuGet correspondente ao provedor de banco de dados em memória do Entity Framework Core.
+```bash
+dotnet run --project MyFinance
 ``` 
-    dotnet add package Microsoft.EntityFrameworkCore.InMemory
+
+## 📚 Objetivo Didático
+Esta branch demonstra:
+- Separação clara entre camadas.
+- Como estruturar soluções profissionais em .NET.
+- Base ideal para introduzir testes unitários (na próxima branch).
+
+## 🏷 Branches Relacionadas
+
+- `main` → versão monolítica inicial
+- `feature/3-tiers` → (esta) arquitetura em 3 camadas
+- `feature/unit-tests` → extensão com testes unitários
+
+## 📄 Licença
+Uso educacional e acadêmico.
+
+---
+
+# ✅ Testes Unitários
+
+Esta branch estende o projeto da branch **feature/3-tiers**, adicionando uma estrutura completa de **testes unitários e de integração** utilizando:
+
+- **xUnit**
+- **Moq**
+- **EF Core InMemory**
+
+O objetivo é demonstrar boas práticas de testes no contexto de uma arquitetura em camadas.
+
+---
+
+## 🧩 Estrutura da Solution
+```
+MyFinance.sln
+│
+├── MyFinance → Camada de Apresentação
+├── MyFinance.Business → Camada de Negócio
+├── MyFinance.DataAccess → Persistência (EF Core)
+└── MyFinance.Tests → Projeto de Testes Unitários e de Integração
+```
+
+---
+
+## 🧪 Tecnologias de Teste Utilizadas
+
+### ✔ **xUnit**  
+Framework de testes moderno, leve e amplamente usado no ecossistema .NET.
+
+### ✔ **Moq**  
+Usado para criação de mocks e stubs para testes unitários isolados.
+
+### ✔ **EF Core InMemory**  
+Permite testes de integração de repositórios e serviços **sem necessidade de banco real**.
+
+---
+
+## 📦 Pacotes Instalados
+
+### No projeto MyFinance.Tests:
+
+```bash
+dotnet add package xunit
+dotnet add package xunit.runner.visualstudio
+dotnet add package Moq
+dotnet add package Microsoft.EntityFrameworkCore.InMemory
 ``` 
-2. o arquivo .cs, certifique-se de ter a seguinte diretiva de using:
+
+## 🛠 Configuração do DbContext InMemory
+Exemplo utilizado nos testes:
+
+```csharp
+var options = new DbContextOptionsBuilder<MyFinanceContext>()
+    .UseInMemoryDatabase("BancoDeTeste")
+    .Options;
+
+var context = new MyFinanceContext(options);
 ``` 
-    using Microsoft.EntityFrameworkCore;
-``` 
-3. Exemplo de uso correto
-``` 
-    var options = new DbContextOptionsBuilder<MyFinanceContext>()
-                                .UseInMemoryDatabase("BancoDeTeste")
-                                .Options;
-``` 
+
+Isso permite testar serviços da camada Business como:
+- Criação de contas
+- Listagem
+- Validação de regras
+- Persistência básica via EF
+
+Sem depender de bancos externos.
+
+## 📈 Melhorias Implementadas Nesta Branch
+
+✔ Novo projeto de testes isolado
+MyFinance.Tests adiciona uma quarta camada na solution, dedicada exclusivamente a testes.
+
+✔ Testes unitários com Moq
+Permite isolar regras de negócio sem envolver EF Core.
+
+✔ Testes de integração com EF InMemory
+Valida comportamentos reais da camada DataAccess sem subir SQL Server ou PostgreSQL.
+
+✔ Maior aderência ao padrão de responsabilidades
+Os testes ajudam a reforçar a separação entre Presentation, Business e DataAccess.
+
+✔ README atualizado documentando o processo
+Inclui instruções explícitas de configuração e exemplos de uso.
+
+▶ Como Executar os Testes
+```csharp 
+dotnet test
+```
+Todos os testes devem rodar contra o banco em memória.
+
+## 📚 Objetivo Didático
+Esta branch ensina:
+- TDD / práticas de testes unitários
+- Testes de integração com EF Core
+- Criação de projeto de testes separado
+- Como isolar regras de negócio via mock
+
+É uma base excelente para estudo de Clean Architecture, DDD e arquiteturas multicamadas.
+
+
+
+
+
+
+
