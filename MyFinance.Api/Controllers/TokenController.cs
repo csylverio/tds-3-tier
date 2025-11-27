@@ -7,26 +7,17 @@ namespace MyFinance.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TokenController : ControllerBase
+public class TokenController(ITokenService tokenService) : ControllerBase
 {
-    private readonly ITokenService tokenService;
-
-    public TokenController(ITokenService tokenService)
-    {
-        this.tokenService = tokenService;
-    }
-
     [HttpPost]
     [AllowAnonymous]
-    public IActionResult Post([FromBody] LoginDTO loginDTO)
+    public IActionResult Post([FromBody] LoginDTO loginDto)
     {
-        var token = tokenService.GetToken(loginDTO);
-
+        var token = tokenService.GetToken(loginDto);
         if (!string.IsNullOrEmpty(token))
         {
             return Ok(token);
         }
-
         return Unauthorized();
     }
 }

@@ -1,203 +1,255 @@
-# MyFinance – Sistema de Gerenciamento de Finanças
+# MyFinance – API 3‑Tier com ASP.NET Core e EF Core (Projeto Acadêmico)
 
-## Descrição
+## Visão Geral
 
-**MyFinance** é um sistema web desenvolvido em ASP.NET MVC com o objetivo de gerenciar finanças pessoais. A aplicação permite que os usuários registrem contas, adicionem transações financeiras (receitas e despesas) e visualizem relatórios em forma de extrato ou gráficos.
+MyFinance é uma Web API em ASP.NET Core (.NET 9) construída em uma arquitetura 3 camadas (API, Business, DataAccess), com autenticação JWT, persistência com Entity Framework Core e PostgreSQL. O objetivo é didático: servir de base para estudos de APIs REST, autenticação/autorização e acesso a dados com EF Core.
 
----
+Estrutura da solução:
 
-## Funcionalidades
+- MyFinance.Api: camada de apresentação (controllers, DTOs, autenticação, middleware, Swagger).
+- MyFinance.Business: domínio e contratos (entidades, interfaces de repositório e serviços).
+- MyFinance.DataAccess: infraestrutura de dados (DbContext, repositórios, migrations EF Core).
+- MyFinance.Tests: testes unitários e de integração com xUnit, Moq e EF Core InMemory.
 
-- **Cadastro de Usuário:** Permite a criação de contas para uso do sistema.
-- **Menu Principal:** Acesso centralizado às funcionalidades.
-- **Cadastro de Contas:** Inclui descrição e data de abertura.
-- **Cadastro de Transações:** Registro de receitas e despesas associadas a contas.
-- **Relatório de Extrato:** Visualização das transações por conta e período.
-- **Relatório Gráfico:** Demonstração de receitas e despesas por período e por conta.
+Tecnologias principais:
 
----
+- .NET 9, ASP.NET Core Web API, C#
+- EF Core + Npgsql (PostgreSQL)
+- JWT Bearer Authentication
+- Swashbuckle/Swagger para documentação
+- Docker Compose para banco de dados
 
-## Requisitos Não-Funcionais
-
-- **IDE:** Microsoft Visual Studio 2022
-- **Framework:** ASP.NET MVC (.NET 8)
-- **Linguagem:** C#
-- **Banco de Dados:** PostgreSQL, MySQL ou SQL Server
+> Nota: Por simplicidade acadêmica, o segredo JWT está em `appsettings.json`. Em projetos reais, use User Secrets/variáveis de ambiente.
 
 ---
 
-## Estrutura do Projeto e Passos de Desenvolvimento
+## Pré‑requisitos
 
-### ✅ Organização Inicial
-
-- Criar a pasta `ViewModels` e mover o `ErrorViewModel` para ela.
-- Compilar (CTRL + SHIFT + B) para verificar erros.
-
----
-
-### ✅ Modelagem Inicial - `Account`
-
-1. Criar classe `Models/Account`.
-2. Criar `AccountsController` (MVC Controller Empty).
-3. Instanciar `List<Account>` e passar como parâmetro para a View.
-4. Criar pasta `Views/Accounts`.
-5. Criar View `Index` com template "List" e model `Account`.
-6. Alterar o título para "Accounts".
+- .NET SDK 9 instalado: `dotnet --version`
+- Docker e Docker Compose instalados
+- EF Core CLI (opcional, mas recomendado): `dotnet tool install --global dotnet-ef`
 
 ---
 
-### 🔄 Refatoração
+## Como Executar (Passo a Passo)
 
-- Excluir `AccountsController` e a pasta `Views/Accounts`.
+1) Clonar e restaurar a solução
 
----
+```bash
+git clone <url-do-repositorio>
+cd tds-3-tier
+dotnet restore
+```
 
-### ✅ Scaffold de CRUD
+2) Subir o PostgreSQL com Docker
 
-1. Criar Scaffold: Controller + Views com Entity Framework.
-2. Selecionar model `Account`, contexto de dados e opções de visualização.
-3. Nomear como `AccountsController`.
+```bash
+docker compose up -d
+```
 
----
+O `docker-compose.yml` inicializa um PostgreSQL exposto em `5432` com usuário `postgres` e senha `102030`.
 
-### ✅ Adaptação e Primeira Migration
+3) Configurar a ConnectionString e o SecretJWT
 
-1. Ajustar a string de conexão.
-2. Verificar injeção de dependência no `Program.cs`.
-3. Instalar provider do banco.
-4. No **Package Manager Console**:
-   ```bash
-   Add-Migration Initial
-   Update-Database
-   ```
+- Já existem valores didáticos em `MyFinance.Api/appsettings.json`:
+  - ConnectionString: `Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=102030`
+  - SecretJWT: `CarroDePalhacoComElefanteBrancoDentro`
 
----
+Você pode sobrescrever via variáveis de ambiente (recomendado):
 
-### ✅ Outras Entidades e Segunda Migration
+Linux/macOS
 
-1. Criar demais modelos de domínio.
-   - Atributos
-   - Relacionamentos (`ICollection`)
-   - Construtores e métodos específicos
-2. Adicionar `DbSet` no `DbContext`.
-3. Migration:
-   ```bash
-   Add-Migration OtherEntities
-   Update-Database
-   ```
+```bash
+export SecretJWT="minha-chave-super-secreta"
+export ConnectionStrings__MyFinanceContext="Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=102030"
+```
 
----
+Windows (PowerShell)
 
-### ✅ Seeding Service
+```powershell
+$env:SecretJWT = "minha-chave-super-secreta"
+$env:ConnectionStrings__MyFinanceContext = "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=102030"
+```
 
-1. Criar `SeedingService` na pasta `Data`.
-2. Registrar e chamar o serviço no `Program.cs`.
+4) Aplicar as migrations do EF Core
 
----
+As migrations estão no projeto `MyFinance.DataAccess` e a configuração (ConnectionString) vive no `MyFinance.Api`. Por isso, use o projeto de inicialização (`--startup-project`) ao atualizar o banco:
 
-### ✅ Transactions
+```bash
+dotnet build
+dotnet ef database update \
+  --project MyFinance.DataAccess \
+  --startup-project MyFinance.Api
+```
 
-#### Criação do Controller e View
+5) Executar a API
 
-1. Criar links no navbar para Account e Transaction.
-2. Criar pasta `Views/Transactions` e View `Index`.
-3. Alterar título da View.
+```bash
+dotnet run --project MyFinance.Api
+```
 
-#### Criar `TransactionService` e método `FindAll`
+Ao iniciar, a API imprime as URLs de escuta. Em desenvolvimento, acesse `http://localhost:<porta>/swagger`.
 
-1. Criar pasta `Services` e classe `TransactionService`.
-2. Registrar no `Program.cs`.
-3. Implementar `FindAll()` retornando `List<Transaction>`.
-4. Usar no `TransactionController`.
+6) Autenticar e usar os endpoints
 
-#### Criar Formulário Simples
+- Obter token JWT: `POST /api/token` com body:
 
-1. Criar link "Create" em `Views/Transactions/Index`.
-2. Implementar `Create` (GET) na controller.
-3. Criar View `Create`.
-4. Implementar `Insert()` no `TransactionService`.
-5. Implementar `Create` (POST) na controller.
+```json
+{
+  "username": "Admin",
+  "password": "Abc123"
+}
+```
 
----
+- Em caso de sucesso, copie o token retornado e, no Swagger, clique em "Authorize" e informe: `Bearer <seu_token>`.
+- Endpoints de contas (`/api/account`) exigem autenticação. O `DELETE` exige a role `Privileged`.
 
-### ✅ Chave Estrangeira Obrigatória
+Credenciais didáticas (configuradas via middleware):
 
-1. Adicionar `AccountId` em `Transaction`.
-2. Dropar banco, recriar migration:
-   ```bash
-   Drop-Database
-   Add-Migration TransactionFK
-   Update-Database
-   ```
-3. Atualizar `Insert()` no `TransactionService`.
+- Admin / Abc123 → Role: Privileged
+- Fiap / Abc123 → Role: Public
 
 ---
 
-### ✅ TransactionFormViewModel e Select de Contas
+## O que você encontra em cada camada
 
-1. Criar `AccountService` com `FindAll()`.
-2. Registrar no `Program.cs`.
-3. Criar `TransactionFormViewModel`.
-4. Atualizar Controller:
-   - Injetar `AccountService`
-   - Atualizar `Create` GET
-5. Atualizar View `Create`:
-   - Usar `TransactionFormViewModel`
-   - Adicionar campo `select` para `AccountId`
+- API (`MyFinance.Api`)
+  - `Program.cs`: DI, DbContext (PostgreSQL), autenticação JWT, Swagger com segurança.
+  - Controllers: `AccountController`, `TokenController`.
+  - DTOs com data annotations para validação.
+  - Middleware didático que provisiona logins em memória a cada requisição.
 
----
+- Business (`MyFinance.Business`)
+  - Entidade `Account` (domínio).
+  - Contratos `IAccountRepository`, `IAccountService`.
+  - Serviço `AccountService` (regras de negócio e orquestração do repositório).
 
-### ✅ Detalhes da Transação e Eager Loading
+- DataAccess (`MyFinance.DataAccess`)
+  - `MyFinanceContext` (DbContext) e `DbSet<Account>`.
+  - `AccountRepository` com EF Core.
+  - Migrations do EF Core.
 
-1. Adicionar link para `Details` em `Views/Transactions/Index`.
-2. Criar Action `Details` no Controller.
-3. Criar View `Details`.
-4. Incluir `Include(obj => obj.Account)` no `FindAll()`.
-
----
-
-## Tecnologias Utilizadas
-
-- ASP.NET Core MVC (.NET 8)
-- C#
-- Entity Framework Core
-- PostgreSQL / MySQL / SQL Server
-- Bootstrap (para layout)
+- Tests (`MyFinance.Tests`)
+  - Testes unitários de serviço com Moq.
+  - Testes de integração de repositório com `Microsoft.EntityFrameworkCore.InMemory`.
 
 ---
 
-## Instruções para Execução
+## Como o projeto foi criado (passo a passo didático)
 
-1. Clone o repositório.
-2. Configure a string de conexão em `appsettings.json`.
-3. Execute os comandos de migration:
-   ```bash
-   Add-Migration Init
-   Update-Database
-   ```
-4. Execute o projeto via Visual Studio (F5).
+1) Criar a solution e os projetos
 
-**OBS**:
-   O comando Add-Migration não é reconhecido no terminal do Linux/macOS, pois esse comando pertence ao PowerShell do Entity Framework Core, usado via o Package Manager Console no Visual Studio (Windows).
-   Utilizar os comandos:
-   ```
-    dotnet ef migrations add Init --project MyFinance
-    dotnet ef database update --project MyFinance
-   ```
+```bash
+dotnet new sln -n MyFinance
+dotnet new webapi -n MyFinance.Api
+dotnet new classlib -n MyFinance.Business
+dotnet new classlib -n MyFinance.DataAccess
+dotnet new xunit -n MyFinance.Tests
+
+dotnet sln add MyFinance.Api MyFinance.Business MyFinance.DataAccess MyFinance.Tests
+```
+
+2) Referências entre projetos
+
+```bash
+dotnet add MyFinance.Api reference MyFinance.Business MyFinance.DataAccess
+dotnet add MyFinance.DataAccess reference MyFinance.Business
+dotnet add MyFinance.Tests reference MyFinance.Business MyFinance.DataAccess
+```
+
+3) Pacotes NuGet principais
+
+- API
+
+```bash
+dotnet add MyFinance.Api package Microsoft.AspNetCore.Authentication.JwtBearer
+dotnet add MyFinance.Api package Microsoft.AspNetCore.OpenApi
+dotnet add MyFinance.Api package Swashbuckle.AspNetCore
+```
+
+- DataAccess
+
+```bash
+dotnet add MyFinance.DataAccess package Npgsql.EntityFrameworkCore.PostgreSQL
+dotnet add MyFinance.DataAccess package Microsoft.EntityFrameworkCore.Tools
+```
+
+- Tests
+
+```bash
+dotnet add MyFinance.Tests package xunit
+dotnet add MyFinance.Tests package xunit.runner.visualstudio
+dotnet add MyFinance.Tests package Moq
+dotnet add MyFinance.Tests package Microsoft.EntityFrameworkCore.InMemory
+```
+
+4) Domínio e acesso a dados
+
+- Criar a entidade `Account` em `MyFinance.Business`.
+- Definir `IAccountRepository` e implementá-lo em `MyFinance.DataAccess` com EF Core.
+- Criar `MyFinanceContext` e registrar `DbSet<Account>`.
+
+5) Configuração da API
+
+- Registrar `DbContext` com `UseNpgsql` no `Program.cs`.
+- Registrar serviços: `IAccountService`, `ITokenService`, `IAccountRepository`.
+- Adicionar Swagger e configurar definição de segurança Bearer.
+- Configurar autenticação JWT (chave lida de configuração).
+
+6) Controllers e DTOs
+
+- `AccountController` com endpoints CRUD protegidos por `[Authorize]`.
+- `TokenController` para emissão de JWT a partir de credenciais didáticas.
+- DTOs para requests/responses com validação.
+
+7) Migrations e banco
+
+```bash
+dotnet ef migrations add Initial \
+  --project MyFinance.DataAccess \
+  --startup-project MyFinance.Api
+dotnet ef database update \
+  --project MyFinance.DataAccess \
+  --startup-project MyFinance.Api
+```
+
+8) Testes
+
+- Testes de unidade do serviço com Moq.
+- Testes de integração do repositório com EF InMemory.
+
+---
+
+## Dicas e Solução de Problemas
+
+- `dotnet ef` não encontrado: instale o CLI com `dotnet tool install --global dotnet-ef` e reabra o terminal.
+- Erro ao conectar no PostgreSQL: verifique `docker compose ps`, portas (`5432`) e `ConnectionStrings__MyFinanceContext`.
+- Conflito de porta 5432: pare outros Postgres locais ou altere o mapeamento no `docker-compose.yml`.
+- HTTPS no Linux/macOS: se necessário, rode `dotnet dev-certs https --trust`.
+- JWT inválido/401: gere token em `/api/token` e informe `Bearer <token>` no botão "Authorize" do Swagger.
+
+---
+
+## Próximos Passos (para estudo)
+
+- Mover segredos (JWT/ConnectionString) para User Secrets/variáveis de ambiente.
+- Adicionar validação de tempo de vida do token e emissor/audiência.
+- Incluir Health Checks (ex.: `/health`) e logs com `ILogger` em vez de `Console.WriteLine`.
+- Habilitar CORS e Rate Limiting conforme cenário.
+- Adicionar pipeline CI (GitHub Actions) com `dotnet build/test` e cobertura.
+
 ---
 
 ## Autor
 
-Desenvolvido como material didático para aulas de ASP.NET MVC com Entity Framework Core.
+Projeto acadêmico para aulas de ASP.NET Core + EF Core, com foco em boas práticas de camadas, autenticação JWT e persistência com PostgreSQL.
 
+## Histórico de Refatorações
 
-## Refactoring
-
- - Solution adicionada a raíz do projeto para permitir adicionar outros projetos (ClassLibrary para representar outras camadas do projeto)
- - Adição do docker-compose contendo script para banco de dados
- - Adição do projeto ClassLibrary MyFinance.Business a Solution
- - Adição do projeto ClassLibrary MyFinance.DataAccess a Solution
- - Movendo diretórios Data e Mifrations para MyFinance.DataAccess
+- Adicionada Solution na raiz para suportar múltiplos projetos (camadas).
+- Adicionado `docker-compose` para provisionar banco PostgreSQL.
+- Criados projetos `MyFinance.Business` e `MyFinance.DataAccess` e adicionadas referências.
+- Movidos diretórios `Data` e `Migrations` para `MyFinance.DataAccess`.
  - Adicionando pacote Entity com Account que representa instância do banco de dados (conceito de DDD) para o MyFinance.Business
  - Adequação das dependencias aos projetos (removendo dependencias do projeto Presentation e adicionando ao projeto DataAccess
  - Adequação de namespace

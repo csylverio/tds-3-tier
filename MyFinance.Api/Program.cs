@@ -1,29 +1,21 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore;
+using MyFinance.DataAccess;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyFinance.Api.Authentication;
 using MyFinance.Api.Middleware;
-using MyFinance.Business.Repository;
 using MyFinance.Business.Service;
-using MyFinance.DataAccess.Data;
-using MyFinance.DataAccess.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddDataAccess(builder.Configuration);
 
 // Injeção de dependencia
-builder.Services.AddDbContext<MyFinanceContext>(options =>
-    options.UseNpgsql(builder.Configuration
-    .GetConnectionString("MyFinanceContext") ?? throw new InvalidOperationException("Connection string 'MyFinanceContext' not found.")));
 builder.Services.AddScoped<ITokenService, TokenSerice>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 // configuração da autenticacao
 var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
