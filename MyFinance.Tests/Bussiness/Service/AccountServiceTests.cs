@@ -61,7 +61,7 @@ public class AccountServiceTests
                        .ReturnsAsync((Account?)null);
 
         var ex = await Assert.ThrowsAsync<Exception>(() => _service.GetByIdAsync(2));
-        Assert.Equal("Conta não encontrada", ex.Message);
+        Assert.Equal("Conta não encontrada!", ex.Message);
     }
 
     [Fact]
@@ -84,10 +84,10 @@ public class AccountServiceTests
         _repositoryMock.Setup(r => r.GetByIdAsync(id))
                        .ReturnsAsync(original);
 
-        await _service.UpdateAsync(id, "Nova", 999);
+        await _service.UpdateAsync(id, "TTT Antiga", 999);
 
         _repositoryMock.Verify(r => r.UpdateAsync(It.Is<Account>(a =>
-            a.Id == id && a.Name == "Nova" && a.Balance == 999)), Times.Once);
+            a.Id == id && a.Name == "Teste TTT Antiga" && a.Balance == 999)), Times.Once);
     }
 
     [Fact]

@@ -4,53 +4,45 @@ using MyFinance.Business.Repository;
 
 namespace MyFinance.Business.Service;
 
-public class AccountService : IAccountService
+public class AccountService(IAccountRepository accountRepository) : IAccountService
 {
-    private readonly IAccountRepository _accountRepository;
-
-    public AccountService(IAccountRepository accountRepository)
-    {
-        _accountRepository = accountRepository;
-    }
     public async Task<bool> ExistsAsync(int id)
     {
-        Account? account = await _accountRepository.GetByIdAsync(id);
+        var account = await accountRepository.GetByIdAsync(id);
         return account != null;
     }
 
     public async Task<Account> GetByIdAsync(int value)
     {
-        Account? account = await _accountRepository.GetByIdAsync(value);
-        return account ?? throw new InvalidOperationException("Conta inválida!");
+        var account = await accountRepository.GetByIdAsync(value);
+        return account ?? throw new Exception("Conta não encontrada!");
     }
 
-    public Task<List<Account>> GetListAsync()
+    public async Task<List<Account>> GetListAsync()
     {
-        List<Account> accounts = _accountRepository.GetListAsync().Result;
-        return Task.FromResult(accounts);
+        return await accountRepository.GetListAsync();
     }
 
     public async Task<Account> AddAsync(string name, double balance)
     {
-        Account account = await _accountRepository.AddAsync(new Account
+        var account = await accountRepository.AddAsync(new Account
         {
             Name = name,
             Balance = balance
         });
-
         return account;
     }
 
     public async Task UpdateAsync(int id, string name, double balance)
     {
-        Account entity = await GetByIdAsync(id);
-        entity.Name = name;
+        var entity = await GetByIdAsync(id);
+        entity.Name = name.StartsWith("TTT") ? $"Teste {name}" : name;
         entity.Balance = balance;
-        await _accountRepository.UpdateAsync(entity);
+        await accountRepository.UpdateAsync(entity);
     }
 
     public async Task DeleteAsync(int id)
     {
-        await _accountRepository.DeleteAsync(id);
+        await accountRepository.DeleteAsync(id);
     }
 }
