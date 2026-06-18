@@ -9,6 +9,6 @@ public class CreateAccountDTO
         [StringLength(100, ErrorMessage = "O nome deve ter até 100 caracteres.")]
         public required string Name { get; set; }
 
-        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "O saldo não pode ser negativo.")]
+        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "O saldo não pode ser negativo.", ParseLimitsInInvariantCulture = true)]
         public decimal Balance { get; set; }
 }

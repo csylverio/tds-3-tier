@@ -23,6 +23,6 @@ public class AccountDTO
         [StringLength(100, ErrorMessage = "O nome deve ter até 100 caracteres.")]
         public string Name { get; set; } = string.Empty;
 
-        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "O saldo não pode ser negativo.")]
+        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "O saldo não pode ser negativo.", ParseLimitsInInvariantCulture = true)]
         public decimal Balance { get; set; }
 }
