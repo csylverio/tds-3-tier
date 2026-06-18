@@ -1,4 +1,4 @@
-using System;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using MyFinance.DataAccess.Data;
@@ -9,10 +9,18 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<MyFinanceC
 {
     public MyFinanceContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<MyFinanceContext>();
+        var apiSettingsPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../MyFinance.Api"));
+        var appSettingsPath = Path.Combine(apiSettingsPath, "appsettings.json");
+        using var appSettings = JsonDocument.Parse(File.ReadAllText(appSettingsPath));
 
-        // ✅ Ajuste a string de conexão conforme seu ambiente
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=102030");
+        var connectionString = appSettings.RootElement
+            .GetProperty("ConnectionStrings")
+            .GetProperty("MyFinanceContext")
+            .GetString()
+            ?? throw new InvalidOperationException("Connection string 'MyFinanceContext' not found.");
+
+        var optionsBuilder = new DbContextOptionsBuilder<MyFinanceContext>();
+        optionsBuilder.UseNpgsql(connectionString);
 
         return new MyFinanceContext(optionsBuilder.Options);
     }

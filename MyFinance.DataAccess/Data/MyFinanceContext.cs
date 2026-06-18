@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyFinance.Business.Entity;
 
 namespace MyFinance.DataAccess.Data
 {
@@ -9,6 +10,15 @@ namespace MyFinance.DataAccess.Data
         {
         }
 
-        public DbSet<Business.Entity.Account> Account { get; set; } = default!;
+        public DbSet<Account> Account { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.Property(account => account.Balance)
+                    .HasColumnType("numeric(18,2)");
+            });
+        }
     }
 }
