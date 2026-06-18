@@ -9,7 +9,7 @@ public class AccountDTO
         {
         }
 
-        public AccountDTO(int id, string name, double balance)
+        public AccountDTO(int id, string name, decimal balance)
         {
                 Id = id;
                 Name = name;
@@ -21,8 +21,8 @@ public class AccountDTO
 
         [Required(ErrorMessage = "O nome é obrigatório.")]
         [StringLength(100, ErrorMessage = "O nome deve ter até 100 caracteres.")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        [Range(0, double.MaxValue, ErrorMessage = "O saldo não pode ser negativo.")]
-        public double Balance { get; set; }
+        [Range(typeof(decimal), "0", "999999999999.99", ErrorMessage = "O saldo não pode ser negativo.")]
+        public decimal Balance { get; set; }
 }

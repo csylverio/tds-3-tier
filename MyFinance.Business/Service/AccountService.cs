@@ -24,13 +24,14 @@ public class AccountService : IAccountService
         return account ?? throw new NotFoundException("Conta inválida!");
     }
 
-    public Task<List<Account>> GetListAsync()
+    public async Task<List<Account>> GetListAsync()
     {
-        List<Account> accounts = _accountRepository.GetListAsync().Result;
-        return Task.FromResult(accounts);
+        // List<Account> accounts = _accountRepository.GetListAsync().Result;
+        // return Task.FromResult(accounts);
+        return await _accountRepository.GetListAsync();
     }
 
-    public async Task<Account> AddAsync(string name, double balance)
+    public async Task<Account> AddAsync(string name, decimal balance)
     {
         Account account = await _accountRepository.AddAsync(new Account
         {
@@ -41,7 +42,7 @@ public class AccountService : IAccountService
         return account;
     }
 
-    public async Task UpdateAsync(int id, string name, double balance)
+    public async Task UpdateAsync(int id, string name, decimal balance)
     {
         Account entity = await GetByIdAsync(id);
         entity.Name = name;

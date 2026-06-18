@@ -7,7 +7,7 @@ using MyFinance.Api.DTOs;
 
 namespace MyFinance.Api.Authentication;
 
-public class TokenSerice(IConfiguration configuration) : ITokenService
+public class TokenService(IConfiguration configuration) : ITokenService
 {
     private readonly IConfiguration configuration = configuration;
 

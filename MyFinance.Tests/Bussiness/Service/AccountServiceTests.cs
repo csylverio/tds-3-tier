@@ -55,20 +55,20 @@ public class AccountServiceTests
     }
 
     [Fact]
-    public async Task GetByIdAsync_ThrowsException_WhenNotFound()
+    public async Task GetByIdAsync_ThrowsNotFoundException_WhenNotFound()
     {
         _repositoryMock.Setup(r => r.GetByIdAsync(2))
                        .ReturnsAsync((Account?)null);
 
-        var ex = await Assert.ThrowsAsync<Exception>(() => _service.GetByIdAsync(2));
-        Assert.Equal("Conta não encontrada", ex.Message);
+        var ex = await Assert.ThrowsAsync<NotFoundException>(() => _service.GetByIdAsync(2));
+        Assert.Equal("Conta inválida!", ex.Message);
     }
 
     [Fact]
     public async Task AddAsync_CallsRepositoryWithCorrectData()
     {
         var name = "Nova Conta";
-        var balance = 500.0;
+        var balance = 500.0m;
 
         await _service.AddAsync(name, balance);
 

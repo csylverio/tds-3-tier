@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,6 +22,31 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API para gerenciamento de contas financeiras",
         Contact = new OpenApiContact { Name = "Carlos Sylverio", Email = "contato@example.com" }
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Insira o token JWT no formato: Bearer {token}",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 builder.Services.AddControllers();
 
@@ -30,7 +54,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<MyFinanceContext>(options =>
     options.UseNpgsql(builder.Configuration
     .GetConnectionString("MyFinanceContext") ?? throw new InvalidOperationException("Connection string 'MyFinanceContext' not found.")));
-builder.Services.AddScoped<ITokenService, TokenSerice>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
@@ -56,36 +80,25 @@ builder.Services
         };
     });
 
-// configuração do swagger para habilitar a autenticação
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Description = "Insira o token JWT no formato: Bearer {token}",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
-        {
-            new OpenApiSecurityScheme {
-                Reference = new OpenApiReference {
-                    Type = ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
-// IMPORTANTE: usar essa configuração somente em DEV
+const string corsPolicyName = "DefaultCorsPolicy";
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy(corsPolicyName, policy =>
     {
-        policy.AllowAnyOrigin()
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+
+            return;
+        }
+
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+        if (allowedOrigins.Length == 0)
+            throw new InvalidOperationException("Configure ao menos uma origem em 'Cors:AllowedOrigins' para ambientes fora de desenvolvimento.");
+
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -102,7 +115,7 @@ if (app.Environment.IsDevelopment())
     // middleware customizado
     app.UseLoginsMiddleware();
 }
-app.UseCors();
+app.UseCors(corsPolicyName);
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();

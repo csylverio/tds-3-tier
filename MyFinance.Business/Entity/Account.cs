@@ -7,11 +7,11 @@ namespace MyFinance.Business.Entity
         [Key]
         public int Id { get; set; }
         public required string Name { get; set; }
-        public double Balance { get; set; }
+        public decimal Balance { get; set; }
 
-        public bool IsBalanceValid(double balance)
+        public bool IsBalanceValid(decimal balance)
         {
-            return Balance >= 0;
+            return balance >= 0;
         }
     }
 }
